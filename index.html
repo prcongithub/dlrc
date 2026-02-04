@@ -2,925 +2,1062 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>School Learning Plan Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School Learning Plan Viewer</title>
 <style>
-    :root {
-        --bg: #f4f6fb;
-        --card-bg: #ffffff;
-        --border: #d7deeb;
-        --text: #20334f;
-        --muted: #6b7a99;
-        --accent: #3b6ef5;
-        --wah-accent: #1f8a5f;
-        --warning: #c0392b;
-        --badge-bg: #e6ecff;
-        --badge-text: #1c3d8f;
-    }
-    * {
-        box-sizing: border-box;
-    }
-    body {
-        margin: 0;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-    }
-    .app {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem 4rem;
-    }
-    header {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        align-items: flex-end;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    header h1 {
-        margin: 0;
-        font-size: clamp(1.6rem, 3vw, 2.1rem);
-        letter-spacing: -0.5px;
-    }
-    header p {
-        margin: 0;
-        color: var(--muted);
-    }
-    .summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 0.75rem;
-        margin-bottom: 1.5rem;
-    }
-    .summary-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        box-shadow: 0 6px 12px rgba(32, 51, 79, 0.05);
-    }
-    .summary-card h2 {
-        margin: 0;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        color: var(--muted);
-        letter-spacing: 0.08em;
-    }
-    .summary-card .value {
-        display: block;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-top: 0.25rem;
-    }
-    .summary-card small {
-        display: block;
-        margin-top: 0.5rem;
-        color: var(--muted);
-        line-height: 1.4;
-    }
-    .subject-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-        margin-top: 0.75rem;
-    }
-    .subject-tag {
-        background: #eaf0ff;
-        color: #1f3d80;
-        padding: 0.35rem 0.6rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        line-height: 1;
-        border: 1px solid rgba(31, 61, 128, 0.15);
-    }
+* {
+  box-sizing: border-box;
+}
 
-    .controls {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 6px 12px rgba(32, 51, 79, 0.05);
-        display: grid;
-        gap: 1rem;
-    }
-    .filter-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        align-items: center;
-    }
-    .filter-row label {
-        font-weight: 600;
-        color: var(--muted);
-        font-size: 0.9rem;
-    }
-    .filter-row .grow {
-        flex: 1 1 220px;
-    }
-    .search-input {
-        width: 100%;
-        padding: 0.65rem 0.75rem;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        font-size: 0.95rem;
-        transition: border 0.2s, box-shadow 0.2s;
-    }
-    .search-input:focus {
-        outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(59, 110, 245, 0.12);
-    }
-    .toggle-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem 1rem;
-    }
-    .toggle {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.9rem;
-        color: var(--muted);
-    }
-    .toggle input {
-        width: 16px;
-        height: 16px;
-    }
+:root {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --border: #e1e6f0;
+  --border-soft: #eef1f7;
+  --primary: #4051b5;
+  --text-main: #1f3044;
+  --text-muted: #5f6c7b;
+  --badge-lesson-bg: #e4e8ff;
+  --badge-lesson-text: #273c75;
+  --badge-wah-bg: #e6f5ec;
+  --badge-wah-text: #1b5e20;
+  --badge-warning-bg: #ffe5e5;
+  --badge-warning-text: #c62828;
+  --wah-highlight: #f5fcf5;
+  --shadow: 0 12px 30px rgba(31, 48, 68, 0.08);
+  font-size: 16px;
+}
 
-    .subject-filter-group {
-        border-top: 1px dashed var(--border);
-        margin-top: 0.25rem;
-        padding-top: 0.75rem;
-    }
-    .subject-filter-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-    }
-    .subject-checkboxes {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.5rem 1rem;
-    }
-    .subject-checkboxes label {
-        display: flex;
-        gap: 0.4rem;
-        font-size: 0.9rem;
-        color: var(--muted);
-        cursor: pointer;
-        align-items: flex-start;
-    }
-    .subject-checkboxes input {
-        margin-top: 0.2rem;
-    }
-    .subject-filter-actions button,
-    .actions button {
-        background: var(--accent);
-        color: #fff;
-        border: none;
-        border-radius: 999px;
-        padding: 0.55rem 1.1rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .subject-filter-actions button.secondary,
-    .actions button.secondary {
-        background: #eff2ff;
-        color: #1f3d80;
-    }
-    .subject-filter-actions button:hover,
-    .actions button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(59, 110, 245, 0.2);
-    }
-    .actions {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  line-height: 1.5;
+}
 
-    .status-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem 1.25rem;
-        align-items: center;
-        margin-bottom: 1rem;
-        color: var(--muted);
-        font-size: 0.9rem;
-    }
-    .status-bar strong {
-        color: var(--text);
-    }
+a {
+  color: inherit;
+}
 
-    details.day-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        overflow: hidden;
-        box-shadow: 0 10px 18px rgba(32, 51, 79, 0.08);
-    }
-    details.day-card[open] {
-        border-color: rgba(59, 110, 245, 0.35);
-    }
-    details.day-card summary {
-        list-style: none;
-        padding: 1rem 1.25rem;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        background: linear-gradient(90deg, #f6f8ff 0%, #ffffff 100%);
-    }
-    details.day-card summary::-webkit-details-marker {
-        display: none;
-    }
-    .summary-left {
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-    }
-    .day-title {
-        font-size: 1.05rem;
-        font-weight: 600;
-    }
-    .badge-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-    }
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.6rem;
-        border-radius: 999px;
-        border: 1px solid transparent;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-    }
-    .badge.lesson {
-        background: #eaf0ff;
-        color: #1f3d80;
-        border-color: rgba(31, 61, 128, 0.2);
-    }
-    .badge.wah {
-        background: #e2f5ec;
-        color: var(--wah-accent);
-        border-color: rgba(31, 138, 95, 0.25);
-    }
-    .badge.warning {
-        background: #ffe8e5;
-        color: var(--warning);
-        border-color: rgba(192, 57, 43, 0.25);
-    }
-    .summary-right {
-        color: var(--muted);
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
 
-    .day-content {
-        padding: 1.25rem;
-        border-top: 1px solid var(--border);
-        background: #fff;
-    }
-    .view-toggle {
-        display: inline-flex;
-        border: 1px solid var(--border);
-        border-radius: 999px;
-        overflow: hidden;
-        margin-bottom: 1rem;
-    }
-    .view-toggle button {
-        background: transparent;
-        border: none;
-        padding: 0.4rem 0.9rem;
-        font-size: 0.85rem;
-        cursor: pointer;
-        color: var(--muted);
-        transition: background 0.2s, color 0.2s;
-    }
-    .view-toggle button.active {
-        background: var(--accent);
-        color: #fff;
-    }
-    .view-toggle button:not(:last-child) {
-        border-right: 1px solid var(--border);
-    }
+header h1 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
 
-    .structured-view.hidden,
-    .raw-view.hidden {
-        display: none;
-    }
-    .subject-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    .subject-card {
-        border: 1px solid #e0e6f5;
-        border-radius: 10px;
-        padding: 0.85rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-        background: #fdfdff;
-    }
-    .subject-title {
-        font-size: 0.95rem;
-        font-weight: 600;
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        color: var(--text);
-    }
-    .subject-section {
-        border-radius: 8px;
-        padding: 0.6rem 0.65rem;
-        background: #fff;
-        border: 1px solid rgba(32, 51, 79, 0.08);
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-    }
-    .subject-section .section-title {
-        font-size: 0.75rem;
-        letter-spacing: 0.06em;
-        color: var(--muted);
-        text-transform: uppercase;
-    }
-    .subject-section .section-body {
-        font-size: 0.9rem;
-        line-height: 1.4;
-        color: var(--text);
-    }
-    .subject-section.wah-section {
-        border-left: 4px solid var(--wah-accent);
-        background: #f2fcf6;
-    }
-    .subject-section.has-no-lesson .section-body {
-        background: #ffeceb;
-        color: var(--warning);
-        border-radius: 6px;
-        padding: 0.35rem 0.4rem;
-        font-weight: 600;
-    }
+header p {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-muted);
+}
 
-    table.raw-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-    }
-    table.raw-table th,
-    table.raw-table td {
-        border: 1px solid #e0e6f5;
-        padding: 0.6rem;
-        text-align: left;
-        vertical-align: top;
-    }
-    table.raw-table th {
-        background: #f6f8ff;
-        color: #1c3d8f;
-        font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-    }
-    table.raw-table td {
-        background: #fff;
-    }
-    table.raw-table td.no-lesson {
-        background: #ffeceb;
-        color: var(--warning);
-        font-weight: 600;
-    }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: var(--card-bg);
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.75rem;
+}
 
-    .empty-state {
-        display: none;
-        text-align: center;
-        padding: 2.5rem 1rem;
-        color: var(--muted);
-        background: transparent;
-        border: 2px dashed var(--border);
-        border-radius: 12px;
-    }
+.control {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
 
-    @media (max-width: 768px) {
-        .subject-checkboxes {
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        }
-        details.day-card summary {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .summary-right {
-            align-self: flex-end;
-        }
-    }
-    @media (max-width: 520px) {
-        header {
-            align-items: flex-start;
-        }
-        .subject-grid {
-            grid-template-columns: 1fr;
-        }
-        .subject-checkboxes {
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        }
-        .search-input {
-            font-size: 1rem;
-        }
-    }
+.control label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.control input[type="text"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccd4e0;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.control input[type="text"]:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(64, 81, 181, 0.18);
+}
+
+.toggle-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #eef2fa;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  transition: background 0.2s, border 0.2s;
+}
+
+.toggle-option input {
+  accent-color: var(--primary);
+}
+
+.toggle-option.active {
+  background: #dfe6ff;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.actions button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.actions button.secondary {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.actions button:hover {
+  filter: brightness(0.95);
+}
+
+.day-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.day-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 1.05rem 1.25rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.day-header:hover,
+.day-card.open .day-header {
+  background: #f0f3ff;
+}
+
+.header-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.date-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.subject-count {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  background: rgba(64, 81, 181, 0.08);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-lesson {
+  background: var(--badge-lesson-bg);
+  color: var(--badge-lesson-text);
+}
+
+.badge-wah {
+  background: var(--badge-wah-bg);
+  color: var(--badge-wah-text);
+}
+
+.badge-warning {
+  background: var(--badge-warning-bg);
+  color: var(--badge-warning-text);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chevron {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+}
+
+.day-card.open .chevron {
+  transform: rotate(-135deg);
+}
+
+.day-body {
+  display: none;
+  border-top: 1px solid var(--border-soft);
+  padding: 0 1.25rem 1.35rem;
+  background: #fbfcff;
+}
+
+.day-card.open .day-body {
+  display: block;
+}
+
+.view-toggle {
+  display: inline-flex;
+  background: #eef2fa;
+  padding: 0.25rem;
+  border-radius: 999px;
+  margin: 1.25rem 0 1rem;
+  gap: 0.25rem;
+}
+
+.view-toggle button {
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.view-toggle button.active {
+  background: var(--card-bg);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(31, 48, 68, 0.1);
+}
+
+.view-section {
+  display: none;
+}
+
+.view-section.active {
+  display: block;
+}
+
+.subject-grid {
+  --subject-grid-columns: minmax(150px, 0.9fr) minmax(200px, 1fr) minmax(200px, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+
+.subject-row {
+  display: grid;
+  grid-template-columns: var(--subject-grid-columns);
+  border-bottom: 1px solid var(--border);
+}
+
+.subject-row:last-child {
+  border-bottom: none;
+}
+
+.subject-row.header {
+  background: #f5f7fb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.subject-row:not(.header):nth-child(even) {
+  background: #f9fbff;
+}
+
+.cell {
+  padding: 0.85rem 0.95rem;
+  border-right: 1px solid var(--border);
+  min-height: 100%;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.cell:last-child {
+  border-right: none;
+}
+
+.subject-cell {
+  font-weight: 600;
+  color: #2d3a52;
+}
+
+.wah-cell {
+  background: var(--wah-highlight);
+  border-left: 1px solid #d8eedc;
+}
+
+.wah-cell.has-content {
+  box-shadow: inset 3px 0 0 #9bcba7;
+}
+
+.lesson-cell.has-content {
+  box-shadow: inset 3px 0 0 rgba(64, 81, 181, 0.45);
+}
+
+.no-lesson {
+  background: rgba(198, 40, 40, 0.12);
+  color: var(--badge-warning-text);
+  padding: 0.05rem 0.25rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: 1rem;
+  background: #fff4d6;
+  border: 1px solid #ffd27f;
+  color: #8a5a00;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.raw-view {
+  margin-top: 1.2rem;
+}
+
+.raw-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.6rem;
+  gap: 0.5rem;
+}
+
+.raw-controls button {
+  background: #eef2fa;
+  color: #2f3c54;
+  border: 1px solid #c9d4ee;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+.raw-controls button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.raw-table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: auto;
+  background: var(--card-bg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.raw-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  table-layout: fixed;
+  font-size: 0.85rem;
+}
+
+.raw-table th,
+.raw-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 0.75rem;
+  vertical-align: top;
+  text-align: left;
+}
+
+.raw-table th {
+  background: #f5f7fb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.raw-table tr:last-child td {
+  border-bottom: none;
+}
+
+.raw-table:not(.wide) th,
+.raw-table:not(.wide) td {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.raw-table.wide {
+  table-layout: auto;
+}
+
+.raw-table.wide th,
+.raw-table.wide td {
+  white-space: normal;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2.25rem 1rem;
+  border: 2px dashed #c1cbe0;
+  border-radius: 14px;
+  color: var(--text-muted);
+  background: rgba(205, 213, 235, 0.2);
+  font-size: 1rem;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 992px) {
+  .subject-row {
+    grid-template-columns: minmax(120px, 0.9fr) minmax(180px, 1fr) minmax(180px, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .controls {
+    padding: 1rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-left {
+    gap: 0.5rem;
+  }
+
+  .subject-grid {
+    border: none;
+    background: transparent;
+  }
+
+  .subject-row.header {
+    display: none;
+  }
+
+  .subject-row {
+    grid-template-columns: 1fr;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: var(--card-bg);
+  }
+
+  .subject-row:not(.header):nth-child(even) {
+    background: var(--card-bg);
+  }
+
+  .cell {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cell:last-child {
+    border-bottom: none;
+  }
+
+  .cell::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .wah-cell {
+    border-left: none;
+  }
+
+  .raw-table {
+    min-width: 480px;
+  }
+}
+
+@media (max-width: 540px) {
+  .date-title {
+    font-size: 1rem;
+  }
+
+  .subject-count {
+    font-size: 0.8rem;
+  }
+
+  .badge {
+    font-size: 0.68rem;
+  }
+
+  .control {
+    min-width: 100%;
+  }
+}
 </style>
 </head>
 <body>
 <div class="app">
-    <header>
-        <div>
-            <h1>Day-wise &amp; Subject-wise Learning Plan</h1>
-            <p>Interactive view of lesson plans and work-at-home tasks extracted from Excel rows.</p>
-        </div>
-    </header>
+  <header>
+    <h1>Day-wise Learning Plan</h1>
+    <p>Browse lesson plans and work-at-home assignments by date. Use the filters to quickly find the information you need.</p>
+  </header>
 
-    <section class="summary">
-        <div class="summary-card">
-            <h2>Days Loaded</h2>
-            <span class="value" id="totalDays">0</span>
-            <small>Unique calendar days represented in the data.</small>
-        </div>
-        <div class="summary-card">
-            <h2>Subjects Detected</h2>
-            <span class="value" id="totalSubjects">0</span>
-            <small>Distinct subject columns found across all rows.</small>
-            <div class="subject-tags" id="subjectTagList"></div>
-        </div>
-        <div class="summary-card">
-            <h2>Currently Showing</h2>
-            <span class="value"><span id="visibleCount">0</span> / <span id="totalCount">0</span></span>
-            <small>Matching days after applying filters.</small>
-        </div>
-    </section>
-
-    <section class="controls">
-        <div class="filter-row">
-            <label for="searchInput">Search plan</label>
-            <div class="grow">
-                <input id="searchInput" class="search-input" type="search" placeholder="Search by date, subject, or any text…">
-            </div>
-        </div>
-        <div class="filter-row toggle-group">
-            <label class="toggle"><input type="checkbox" id="filterLesson"> Show only days with Lesson Plan entries</label>
-            <label class="toggle"><input type="checkbox" id="filterWah"> Show only days with WAH entries</label>
-        </div>
-        <div class="subject-filter-group">
-            <div class="subject-filter-header">
-                <strong style="font-size:0.95rem;color:var(--text);">Filter by subjects</strong>
-                <div class="subject-filter-actions">
-                    <button type="button" class="secondary" id="clearSubjects">Clear selection</button>
-                </div>
-            </div>
-            <div class="subject-checkboxes" id="subjectFilters"></div>
-        </div>
-        <div class="actions">
-            <button type="button" id="expandAll">Expand all</button>
-            <button type="button" class="secondary" id="collapseAll">Collapse all</button>
-        </div>
-    </section>
-
-    <div class="status-bar">
-        <span><strong>Tip:</strong> Use the “Raw Data” view inside each day to inspect the original Excel rows.</span>
+  <section class="controls">
+    <div class="control">
+      <label for="searchInput">Search across dates, subjects, and notes</label>
+      <input type="text" id="searchInput" placeholder="Search… (e.g., English, No Lesson, worksheet)">
     </div>
+    <div class="control">
+      <label>Filters</label>
+      <div class="toggle-group">
+        <label class="toggle-option" for="filterWAH">
+          <input type="checkbox" id="filterWAH">
+          Show only days with WAH
+        </label>
+        <label class="toggle-option" for="filterLesson">
+          <input type="checkbox" id="filterLesson">
+          Show only days with Lesson Plan
+        </label>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" id="expandCollapseBtn">Expand all</button>
+    </div>
+  </section>
 
-    <div id="daysContainer"></div>
-    <div class="empty-state" id="emptyState">No days match the current filters or search term. Adjust the filters to see results.</div>
+  <main id="daysContainer"></main>
+
+  <div id="noResults" class="no-results hidden">
+    No days match your filters or search. Try adjusting your criteria.
+  </div>
 </div>
 
 <script>
-const data = /* I will paste data here */ {"Thu, 12 Feb":{"lesson_plan":{"row_number":16,"Date":"Thu, 12 Feb","Component":"Lesson Plan","Morning Circle / HR":"Experience of playing - sharing by students","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: \nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":17,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 11 Feb":{"lesson_plan":{"row_number":18,"Date":"Wed, 11 Feb","Component":"Lesson Plan","Morning Circle / HR":"Experience of playing - sharing by students","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: \nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":19,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Tue, 10 Feb":{"lesson_plan":{"row_number":20,"Date":"Tue, 10 Feb","Component":"Lesson Plan","Morning Circle / HR":"Le Panga match for G3","Art":"","EVLF":"","Design Lab":"","English":"Le Panga- Kabaddi Tournament","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"No lesson","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":21,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Mon, 9 Feb":{"lesson_plan":{"row_number":22,"Date":"Mon, 9 Feb","Component":"Lesson Plan","Morning Circle / HR":"G3 assembly presentation\nShort film on inventions for Science Month","Art":"","EVLF":"","Design Lab":"","English":"No Lesson","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: Are you all stars? Give reason.\nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":23,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Fri, 6 Feb":{"lesson_plan":{"row_number":25,"Date":"Fri, 6 Feb","Component":"Lesson Plan","Morning Circle / HR":"Section-wise assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resource: English textbook and Notebook\nBring fevicol to paste SA4 papers in your notebook\n\nWarmUp: Distribution of SA-4 paper and pasting it in the notebook\nMain Lesson: Reading the playscript on page 88\nPractise Work: New words ","Creative Writing":"No lesson","Hindi":"S.A -4 Writing","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU:  Few questions on area, perimeter and units\nML & PW: Solve from tb pg no 168 Q1,2 and 3 in NB","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: Are you all stars? Give reason.\nML: Establishing the relationship between celestial bodies in the solar system.(orbits, asteroids, moon, sun)\nPW: After reading page 110 (Our solar system), solve activity (1,2,3)\nPg 112 (Q 1,2,3)","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":26,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"Solve from tb pg no 170 Q4 and 5 in your NB. Submit on 10th Feb","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Solve : Pg, 112 (Q. 4,5,6) \nDue : Monday 09 Feb","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 5 Feb":{"lesson_plan":{"row_number":27,"Date":"Thu, 5 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resource: English textbook and Notebook\n\nWarmUp: Introduction to new unit\nMain Lesson: Discussion on different cultures\nPractise Work: What is that one thing you really like about the different cultures that you've been introduced to?","Creative Writing":"No lesson","Hindi":"S.A -4 Reading ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU: SA 4 discussion \nML: Explaining area and perimeter and basic units. Reading vocabulary \nPW: Getting started","Sports":"No Lesson","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Discussion of WAH from last 2 lessons.\nML: What are the different types of habitat?\nHow are different animals suited to their habitats? (animals,plants)\nPW: Solving the questions of pg. 92( Q 1,2,3,4) & Pg. 95 (Q4 -a,b,c,d) & Habitats Worksheet","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":28,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Finish the worksheet.","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 4 Feb":{"lesson_plan":{"row_number":29,"Date":"Wed, 4 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"- Introduce New Project \n- Saura painting","EVLF":"","Design Lab":"SA 4 - Learning fair project","English":"S.A. - 4","Creative Writing":"No lesson","Hindi":"S.A -4 Revision","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU: KBD of Area and perimeter\nML: Introduction of area and perimeter\nPW: Activity for area ( square paper will be given)","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: https://www.youtube.com/watch?v=AuELkcg5A_c&t=30s (Evolution of Pakicetus)\nML: How are different animals suited to their habitats? (animals, birds)\nPW: Finding out the features of the animals based on their habitats - birds,fishes,tiger,kingfisher, Great Indian Bustard, Yellow crowned woodpecker, Hoopoe, Bonelli's eagle.","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":30,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Solve : from the science textbook - pg. 88(1,2,3,4) & pg. 90(Activity 1 - 1)","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Tue, 3 Feb":{"lesson_plan":{"row_number":31,"Date":"Tue, 3 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resources: Only notebook\n\nWarm-Up: Importance of putting the right punctuation and capital letters at the right place\nMain Lesson: Recalling CUPSS rule for punctuating and capitalising the words\nPractise Work: Revision of punctuating the paragraph for SA-4","Creative Writing":"No lesson","Hindi":"No Lesson","Marathi\nResources Folder":"WU: शुद्धलेखन \r\nML: ऐ आणि ओ चा अभ्यास \nPW: वाचन करणे ","Numeracy\nG3 Resource folder":"SA 4","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"No Lesson","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":32,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Mon, 2 Feb":{"lesson_plan":{"row_number":33,"Date":"Mon, 2 Feb","Component":"Lesson Plan","Morning Circle / HR":"Common assembly\nHR lesson: Rehearsal for G3 assembly","Art":"Free Drawing Session","EVLF":"","Design Lab":"No Lesson","English":"No lesson","Creative Writing":"Introduction to non-fiction: Autobiography writing","Hindi":"\nआरम्भ - \"कोयल पुस्तक \"से  \"आलस का फल\"  पाठ पर चर्चा  l \nमुख्य पाठ -पाठ का पठन  l\nअभ्यास कार्य - कठिन शब्दों का लेखन   l ","Marathi\nResources Folder":"SA 4 + मराठी दिवसाच्या कार्यक्रमाबद्दल बोलणे ","Numeracy\nG3 Resource folder":"No Lesson","Sports":"No Lesson","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Pg. 92 Questions about tiger.\nML: Stating the differences between habitat, ecosystem, environment.\nPW: Making a table for differences","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":34,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"WAH : CYP Question 4. \nDUE on 5th Feb.","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Fri, 30 Jan":{"lesson_plan":{"row_number":36,"Date":"Fri, 30 Jan","Component":"Lesson Plan","Morning Circle / HR":"Section-wise common circle","Art":"No Lesson","EVLF":"No Lesson","Design Lab":"No Lesson","English":"Mock Test Discussion and Doubt clarification","Creative Writing":"No Lesson","Hindi":"(कोई Textbook नहीं लानी है सिर्फ Notebook लेकर आना है l) \nआरम्भ -  संवाद लेखन पर  चर्चा  l \nमुख्य पाठ - संवाद का गतिविधि खेल    l\nअभ्यास कार्य -  संवाद लेखन का अभ्यास कार्य  l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of SA4 and Ex 13. 2 any doubts","Sports":"Warmup = information the cooking competition in trek lesson \nMain lesson = We will watch a video to see what food items we are going to prepare\nCloser = List of Items Required for Students","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Pg. 87 of science textbook - Getting started (1,2)\nML: Stating the differences between habitat, ecosystem, environment.\nWhat is a habitat? What are the different types of habitat?\nHow are different animals suited to their habitats? (animals, birds, plants)\nPW: Writing the answers.","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":37,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"WAH : Pg. 90 (Activity 1 : 1,2,3) Due on Monday 2nd Feb","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 29 Jan":{"lesson_plan":{"row_number":38,"Date":"Thu, 29 Jan","Component":"Lesson Plan","Morning Circle / HR":"Practice for assembly","Art":"No Lesson","EVLF":"\nML - Preparing grow bags in Garden for planting cucumbers.","Design Lab":"No Lesson","English":"Mock Test ","Creative Writing":"No Lesson","Hindi":"\nआरम्भ - \"कथा मंजूषा \"पुस्तक से \" पाठ -6 लालची कुत्ता पाठ की पुनरावृत्ति  l \nमुख्य पाठ -पाठ पर आधारित संवाद लेखन गतिविधि खेल    l\nअभ्यास कार्य - संवाद लेखन कार्य   l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of data and percentage","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"SA 4","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":39,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 28 Jan":{"lesson_plan":{"row_number":40,"Date":"Wed, 28 Jan","Component":"Lesson Plan","Morning Circle / HR":"Practice for assembly","Art":"Reflections on Art fest and distribution of artwork ","EVLF":"No Lesson","Design Lab":"Integration with Thematics -  Experiments based on Light ( Reflection, Refraction and Illusion)","English":"Resources: only English notebook\n\nWarm-Up: Recalling the spelling rules and tricks done the previous day and WAH discussion\nMain Lesson: Punctuating the paragraph \nPractise work: Practising punctuating the paragraph","Creative Writing":"No Lesson","Hindi":"\nआरम्भ - \"कथा मंजूषा \"पुस्तक से \" पाठ -6 लालची कुत्ता पाठ की पुनरावृत्ति  l \nमुख्य पाठ -रचनात्मक लेखन पर चर्चा   l\nअभ्यास कार्य - रचनात्मक  लेखन  कार्य  l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of fractions ","Sports":"Tournament preparation \nWarmup =Review all skills \nMain lesson = Bonas, Raiding, Defending practice \nClosing = Group discussion","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Revision for SA 4","PLEASE DO NOT REMOVE THIS COLUMN.":"\\"},"wah":{"row_number":41,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Fri, 30th May 25":{"wah":{"row_number":378,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 29th May 25":{"wah":{"row_number":380,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}}};
+const data = /* I will paste data here */ {"Fri, 6 Feb":{"lesson_plan":{"row_number":25,"Date":"Fri, 6 Feb","Component":"Lesson Plan","Morning Circle / HR":"Section-wise assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resource: English textbook and Notebook\nBring fevicol to paste SA4 papers in your notebook\n\nWarmUp: Distribution of SA-4 paper and pasting it in the notebook\nMain Lesson: Reading the playscript on page 88\nPractise Work: New words ","Creative Writing":"No lesson","Hindi":"S.A -4 Writing","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU:  Few questions on area, perimeter and units\nML & PW: Solve from tb pg no 168 Q1,2 and 3 in NB","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: Are you all stars? Give reason.\nML: Establishing the relationship between celestial bodies in the solar system.(orbits, asteroids, moon, sun)\nPW: After reading page 110 (Our solar system), solve activity (1,2,3)\nPg 112 (Q 1,2,3)","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":26,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"Solve from tb pg no 170 Q4 and 5 in your NB. Submit on 10th Feb","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Solve : Pg, 112 (Q. 4,5,6) \nDue : Monday 09 Feb","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 5 Feb":{"lesson_plan":{"row_number":27,"Date":"Thu, 5 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resource: English textbook and Notebook\n\nWarmUp: Introduction to new unit\nMain Lesson: Discussion on different cultures\nPractise Work: What is that one thing you really like about the different cultures that you've been introduced to?","Creative Writing":"No lesson","Hindi":"S.A -4 Reading ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU: SA 4 discussion \nML: Explaining area and perimeter and basic units. Reading vocabulary \nPW: Getting started","Sports":"No Lesson","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Discussion of WAH from last 2 lessons.\nML: What are the different types of habitat?\nHow are different animals suited to their habitats? (animals,plants)\nPW: Solving the questions of pg. 92( Q 1,2,3,4) & Pg. 95 (Q4 -a,b,c,d) & Habitats Worksheet","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":28,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Finish the worksheet.","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 4 Feb":{"lesson_plan":{"row_number":29,"Date":"Wed, 4 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"- Introduce New Project \n- Saura painting","EVLF":"","Design Lab":"SA 4 - Learning fair project","English":"S.A. - 4","Creative Writing":"No lesson","Hindi":"S.A -4 Revision","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"WU: KBD of Area and perimeter\nML: Introduction of area and perimeter\nPW: Activity for area ( square paper will be given)","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: https://www.youtube.com/watch?v=AuELkcg5A_c&t=30s (Evolution of Pakicetus)\nML: How are different animals suited to their habitats? (animals, birds)\nPW: Finding out the features of the animals based on their habitats - birds,fishes,tiger,kingfisher, Great Indian Bustard, Yellow crowned woodpecker, Hoopoe, Bonelli's eagle.","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":30,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Solve : from the science textbook - pg. 88(1,2,3,4) & pg. 90(Activity 1 - 1)","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Tue, 3 Feb":{"lesson_plan":{"row_number":31,"Date":"Tue, 3 Feb","Component":"Lesson Plan","Morning Circle / HR":"Rehearsal for G3 assembly","Art":"No Lesson","EVLF":"","Design Lab":"No Lesson","English":"Resources: Only notebook\n\nWarm-Up: Importance of putting the right punctuation and capital letters at the right place\nMain Lesson: Recalling CUPSS rule for punctuating and capitalising the words\nPractise Work: Revision of punctuating the paragraph for SA-4","Creative Writing":"No lesson","Hindi":"No Lesson","Marathi\nResources Folder":"WU: शुद्धलेखन \r\nML: ऐ आणि ओ चा अभ्यास \nPW: वाचन करणे ","Numeracy\nG3 Resource folder":"SA 4","Sports":"Kabaddi Match practice","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"No Lesson","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":32,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Mon, 2 Feb":{"lesson_plan":{"row_number":33,"Date":"Mon, 2 Feb","Component":"Lesson Plan","Morning Circle / HR":"Common assembly\nHR lesson: Rehearsal for G3 assembly","Art":"Free Drawing Session","EVLF":"","Design Lab":"No Lesson","English":"No lesson","Creative Writing":"Introduction to non-fiction: Autobiography writing","Hindi":"\nआरम्भ - \"कोयल पुस्तक \"से  \"आलस का फल\"  पाठ पर चर्चा  l \nमुख्य पाठ -पाठ का पठन  l\nअभ्यास कार्य - कठिन शब्दों का लेखन   l ","Marathi\nResources Folder":"SA 4 + मराठी दिवसाच्या कार्यक्रमाबद्दल बोलणे ","Numeracy\nG3 Resource folder":"No Lesson","Sports":"No Lesson","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Pg. 92 Questions about tiger.\nML: Stating the differences between habitat, ecosystem, environment.\nPW: Making a table for differences","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":34,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"WAH : CYP Question 4. \nDUE on 5th Feb.","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Fri, 30 Jan":{"lesson_plan":{"row_number":36,"Date":"Fri, 30 Jan","Component":"Lesson Plan","Morning Circle / HR":"Section-wise common circle","Art":"No Lesson","EVLF":"No Lesson","Design Lab":"No Lesson","English":"Mock Test Discussion and Doubt clarification","Creative Writing":"No Lesson","Hindi":"(कोई Textbook नहीं लानी है सिर्फ Notebook लेकर आना है l) \nआरम्भ -  संवाद लेखन पर  चर्चा  l \nमुख्य पाठ - संवाद का गतिविधि खेल    l\nअभ्यास कार्य -  संवाद लेखन का अभ्यास कार्य  l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of SA4 and Ex 13. 2 any doubts","Sports":"Warmup = information the cooking competition in trek lesson \nMain lesson = We will watch a video to see what food items we are going to prepare\nCloser = List of Items Required for Students","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme: Earth and its habitat\nResource: Textbook needed\n\nWU: Pg. 87 of science textbook - Getting started (1,2)\nML: Stating the differences between habitat, ecosystem, environment.\nWhat is a habitat? What are the different types of habitat?\nHow are different animals suited to their habitats? (animals, birds, plants)\nPW: Writing the answers.","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":37,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"WAH : Pg. 90 (Activity 1 : 1,2,3) Due on Monday 2nd Feb","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 29 Jan":{"lesson_plan":{"row_number":38,"Date":"Thu, 29 Jan","Component":"Lesson Plan","Morning Circle / HR":"Practice for assembly","Art":"No Lesson","EVLF":"\nML - Preparing grow bags in Garden for planting cucumbers.","Design Lab":"No Lesson","English":"Mock Test ","Creative Writing":"No Lesson","Hindi":"\nआरम्भ - \"कथा मंजूषा \"पुस्तक से \" पाठ -6 लालची कुत्ता पाठ की पुनरावृत्ति  l \nमुख्य पाठ -पाठ पर आधारित संवाद लेखन गतिविधि खेल    l\nअभ्यास कार्य - संवाद लेखन कार्य   l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of data and percentage","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"SA 4","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":39,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 28 Jan":{"lesson_plan":{"row_number":40,"Date":"Wed, 28 Jan","Component":"Lesson Plan","Morning Circle / HR":"Practice for assembly","Art":"Reflections on Art fest and distribution of artwork ","EVLF":"No Lesson","Design Lab":"Integration with Thematics -  Experiments based on Light ( Reflection, Refraction and Illusion)","English":"Resources: only English notebook\n\nWarm-Up: Recalling the spelling rules and tricks done the previous day and WAH discussion\nMain Lesson: Punctuating the paragraph \nPractise work: Practising punctuating the paragraph","Creative Writing":"No Lesson","Hindi":"\nआरम्भ - \"कथा मंजूषा \"पुस्तक से \" पाठ -6 लालची कुत्ता पाठ की पुनरावृत्ति  l \nमुख्य पाठ -रचनात्मक लेखन पर चर्चा   l\nअभ्यास कार्य - रचनात्मक  लेखन  कार्य  l ","Marathi\nResources Folder":"No Lesson","Numeracy\nG3 Resource folder":"Revision of fractions ","Sports":"Tournament preparation \nWarmup =Review all skills \nMain lesson = Bonas, Raiding, Defending practice \nClosing = Group discussion","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Revision for SA 4","PLEASE DO NOT REMOVE THIS COLUMN.":"\\"},"wah":{"row_number":41,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Fri, 30th May 25":{"wah":{"row_number":378,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 29th May 25":{"wah":{"row_number":380,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}}};
 
-(function () {
-    const metaFields = new Set(['row_number', 'Date', 'Component']);
-    const allSubjectSet = new Set();
-    const intermediateDays = [];
+(function() {
+  const ignoreColumns = new Set(["row_number", "Date", "Component", "PLEASE DO NOT REMOVE THIS COLUMN.", ""]);
+  const container = document.getElementById("daysContainer");
+  const searchInput = document.getElementById("searchInput");
+  const filterWAH = document.getElementById("filterWAH");
+  const filterLesson = document.getElementById("filterLesson");
+  const expandCollapseBtn = document.getElementById("expandCollapseBtn");
+  const noResultsEl = document.getElementById("noResults");
+  const toggleLabels = document.querySelectorAll(".toggle-option");
 
-    for (const [date, payload] of Object.entries(data)) {
-        const lesson = payload.lesson_plan || null;
-        const wah = payload.wah || null;
+  const dayCards = [];
+  let allExpanded = false;
 
-        const collectSubjects = (row) => {
-            if (!row) return;
-            for (const key of Object.keys(row)) {
-                if (!metaFields.has(key)) {
-                    allSubjectSet.add(key);
-                }
-            }
-        };
-        collectSubjects(lesson);
-        collectSubjects(wah);
+  function escapeHTML(value) {
+    return value.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+  }
 
-        intermediateDays.push({ date, lesson, wah });
+  function formatCellValue(raw) {
+    if (raw === null || raw === undefined) {
+      return {
+        displayHTML: "—",
+        plainText: "",
+        isEmpty: true,
+        containsNoLesson: false
+      };
     }
+    const stringValue = String(raw);
+    const trimmed = stringValue.trim();
+    if (!trimmed) {
+      return {
+        displayHTML: "—",
+        plainText: "",
+        isEmpty: true,
+        containsNoLesson: false
+      };
+    }
+    const escaped = escapeHTML(stringValue);
+    const withBreaks = escaped.replace(/\r\n|\r|\n/g, "<br>");
+    const containsNoLesson = /no\s*lesson/i.test(stringValue);
+    const highlighted = withBreaks.replace(/no\s*lesson/gi, match => `<span class="no-lesson">${match}</span>`);
+    return {
+      displayHTML: highlighted,
+      plainText: trimmed.replace(/\s+/g, " "),
+      isEmpty: false,
+      containsNoLesson
+    };
+  }
 
-    const allSubjects = Array.from(allSubjectSet);
-    const dayObjects = intermediateDays.map(buildDayObject);
-    renderApp(dayObjects, allSubjects);
-
-    function buildDayObject(entry) {
-        const subjects = allSubjects.map(subjectName => {
-            const lessonRaw = entry.lesson ? entry.lesson[subjectName] ?? '' : '';
-            const wahRaw = entry.wah ? entry.wah[subjectName] ?? '' : '';
-            return {
-                name: subjectName,
-                lesson: makeSection(lessonRaw),
-                wah: makeSection(wahRaw)
-            };
-        });
-
-        const aggregatedPieces = [entry.date];
-        subjects.forEach(s => {
-            aggregatedPieces.push(s.name, s.lesson.raw, s.wah.raw);
-        });
-        if (entry.lesson) {
-            aggregatedPieces.push(...flattenRow(entry.lesson));
+  function getSubjectsInOrder(rows) {
+    const subjects = [];
+    rows.forEach(row => {
+      if (!row) return;
+      Object.keys(row).forEach(key => {
+        if (ignoreColumns.has(key)) return;
+        if (!subjects.includes(key)) {
+          subjects.push(key);
         }
-        if (entry.wah) {
-            aggregatedPieces.push(...flattenRow(entry.wah));
+      });
+    });
+    return subjects;
+  }
+
+  function createBadge(text, className) {
+    const span = document.createElement("span");
+    span.className = `badge ${className}`;
+    span.textContent = text;
+    return span;
+  }
+
+  function setCardOpen(card, open) {
+    const headerBtn = card.querySelector(".day-header");
+    const body = card.querySelector(".day-body");
+    const chevron = card.querySelector(".chevron");
+    if (open) {
+      card.classList.add("open");
+    } else {
+      card.classList.remove("open");
+    }
+    if (headerBtn) {
+      headerBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    if (body) {
+      body.classList.toggle("hidden", !open);
+    }
+  }
+
+  function buildRawTable(columns, rows) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "raw-table-wrapper";
+
+    const table = document.createElement("table");
+    table.className = "raw-table";
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    columns.forEach(col => {
+      const th = document.createElement("th");
+      th.textContent = col;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.forEach(row => {
+      const tr = document.createElement("tr");
+      columns.forEach(col => {
+        const td = document.createElement("td");
+        const value = row && Object.prototype.hasOwnProperty.call(row, col) ? row[col] : "";
+        const formatted = formatCellValue(value);
+        td.innerHTML = formatted.displayHTML;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    wrapper.appendChild(table);
+
+    return { wrapper, table };
+  }
+
+  function createDayCard(dateLabel, dayData) {
+    const card = document.createElement("article");
+    card.className = "day-card";
+    const bodyId = `day-body-${Math.random().toString(36).slice(2, 9)}`;
+
+    const headerBtn = document.createElement("button");
+    headerBtn.type = "button";
+    headerBtn.className = "day-header";
+    headerBtn.setAttribute("aria-expanded", "false");
+    headerBtn.setAttribute("aria-controls", bodyId);
+
+    const headerLeft = document.createElement("div");
+    headerLeft.className = "header-left";
+
+    const dateTitle = document.createElement("div");
+    dateTitle.className = "date-title";
+    dateTitle.textContent = dateLabel;
+    headerLeft.appendChild(dateTitle);
+
+    const badgeGroup = document.createElement("div");
+    badgeGroup.className = "badge-group";
+
+    const headerRight = document.createElement("div");
+    headerRight.className = "header-right";
+
+    const subjectCount = document.createElement("span");
+    subjectCount.className = "subject-count";
+
+    const chevron = document.createElement("span");
+    chevron.className = "chevron";
+    chevron.setAttribute("aria-hidden", "true");
+
+    headerRight.appendChild(subjectCount);
+    headerRight.appendChild(chevron);
+
+    headerBtn.appendChild(headerLeft);
+    headerBtn.appendChild(headerRight);
+
+    const body = document.createElement("div");
+    body.className = "day-body hidden";
+    body.id = bodyId;
+
+    const lessonRow = dayData && dayData.lesson_plan ? dayData.lesson_plan : null;
+    const wahRow = dayData && dayData.wah ? dayData.wah : null;
+
+    const subjectOrder = getSubjectsInOrder([lessonRow, wahRow]);
+    subjectCount.textContent = `Subjects: ${subjectOrder.length}`;
+
+    let hasLessonEntries = false;
+    let hasWAHEntries = false;
+    let hasNoLessonEntries = false;
+    const searchPieces = [dateLabel];
+
+    const viewToggle = document.createElement("div");
+    viewToggle.className = "view-toggle";
+
+    const planTabBtn = document.createElement("button");
+    planTabBtn.type = "button";
+    planTabBtn.className = "active";
+    planTabBtn.textContent = "Plan view";
+    planTabBtn.setAttribute("aria-pressed", "true");
+
+    const rawTabBtn = document.createElement("button");
+    rawTabBtn.type = "button";
+    rawTabBtn.textContent = "Raw data";
+    rawTabBtn.setAttribute("aria-pressed", "false");
+
+    viewToggle.appendChild(planTabBtn);
+    viewToggle.appendChild(rawTabBtn);
+
+    const planSection = document.createElement("div");
+    planSection.className = "view-section active plan-section";
+
+    const rawSection = document.createElement("div");
+    rawSection.className = "view-section raw-section";
+
+    if (subjectOrder.length) {
+      const grid = document.createElement("div");
+      grid.className = "subject-grid";
+
+      const headerRow = document.createElement("div");
+      headerRow.className = "subject-row header";
+
+      const subjectHeader = document.createElement("div");
+      subjectHeader.className = "cell";
+      subjectHeader.textContent = "Subject";
+      headerRow.appendChild(subjectHeader);
+
+      const lessonHeader = document.createElement("div");
+      lessonHeader.className = "cell";
+      lessonHeader.textContent = "Lesson Plan";
+      headerRow.appendChild(lessonHeader);
+
+      const wahHeader = document.createElement("div");
+      wahHeader.className = "cell";
+      wahHeader.textContent = "WAH (Work at Home)";
+      headerRow.appendChild(wahHeader);
+
+      grid.appendChild(headerRow);
+
+      subjectOrder.forEach(subject => {
+        const row = document.createElement("div");
+        row.className = "subject-row";
+
+        const subjectCell = document.createElement("div");
+        subjectCell.className = "cell subject-cell";
+        subjectCell.dataset.label = "Subject";
+        const subjectDisplay = escapeHTML(subject).replace(/\r\n|\r|\n/g, "<br>");
+        subjectCell.innerHTML = subjectDisplay || "—";
+        row.appendChild(subjectCell);
+
+        const lessonCell = document.createElement("div");
+        lessonCell.className = "cell lesson-cell";
+        lessonCell.dataset.label = "Lesson Plan";
+        const lessonValue = lessonRow && Object.prototype.hasOwnProperty.call(lessonRow, subject) ? lessonRow[subject] : "";
+        const lessonInfo = formatCellValue(lessonValue);
+        lessonCell.innerHTML = lessonInfo.displayHTML;
+        if (!lessonInfo.isEmpty) {
+          lessonCell.classList.add("has-content");
+          hasLessonEntries = true;
+          searchPieces.push(lessonInfo.plainText);
         }
-        const aggregatedText = aggregatedPieces.join(' | ').toLowerCase();
-
-        const hasLesson = subjects.some(s => s.lesson.hasContent);
-        const hasWah = subjects.some(s => s.wah.hasContent);
-        const hasNoLesson = subjects.some(s => s.lesson.hasNoLesson || s.wah.hasNoLesson);
-
-        const rawRows = [];
-        if (entry.lesson) rawRows.push({ label: entry.lesson.Component || 'Lesson Plan', data: entry.lesson });
-        if (entry.wah) rawRows.push({ label: entry.wah.Component || 'WAH', data: entry.wah });
-
-        return {
-            date: entry.date,
-            subjects,
-            aggregatedText,
-            hasLesson,
-            hasWah,
-            hasNoLesson,
-            rawRows
-        };
-    }
-
-    function flattenRow(row) {
-        const pairs = [];
-        for (const [key, value] of Object.entries(row)) {
-            pairs.push(key, value);
+        if (lessonInfo.containsNoLesson) {
+          hasNoLessonEntries = true;
         }
-        return pairs;
-    }
+        row.appendChild(lessonCell);
 
-    function makeSection(rawValue) {
-        const hasContent = rawValue !== undefined && rawValue !== null && String(rawValue).trim() !== '';
-        const cleaned = hasContent ? sanitizeText(String(rawValue)) : '—';
-        const hasNoLesson = hasContent && /no lesson/i.test(String(rawValue));
-        return {
-            raw: rawValue ?? '',
-            display: cleaned,
-            hasContent,
-            hasNoLesson
-        };
-    }
-
-    function sanitizeText(text) {
-        const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        return escapeHtml(normalized).replace(/\n/g, '<br>');
-    }
-
-    function escapeHtml(str) {
-        return str.replace(/[&<>"']/g, function (char) {
-            switch (char) {
-                case '&': return '&amp;';
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case '"': return '&quot;';
-                case "'": return '&#39;';
-                default: return char;
-            }
-        });
-    }
-
-    function renderApp(days, subjects) {
-        const totalDaysEl = document.getElementById('totalDays');
-        const totalSubjectsEl = document.getElementById('totalSubjects');
-        const totalCountEl = document.getElementById('totalCount');
-        const visibleCountEl = document.getElementById('visibleCount');
-        const subjectTagList = document.getElementById('subjectTagList');
-        const subjectFiltersEl = document.getElementById('subjectFilters');
-        const daysContainer = document.getElementById('daysContainer');
-        const emptyState = document.getElementById('emptyState');
-
-        totalDaysEl.textContent = days.length;
-        totalSubjectsEl.textContent = subjects.length;
-        totalCountEl.textContent = days.length;
-        visibleCountEl.textContent = days.length;
-
-        subjectTagList.innerHTML = '';
-        subjects.forEach(sub => {
-            const tag = document.createElement('span');
-            tag.className = 'subject-tag';
-            tag.innerHTML = escapeHtml(sub).replace(/\n/g, ' / ');
-            subjectTagList.appendChild(tag);
-        });
-
-        const state = {
-            searchTerm: '',
-            onlyLesson: false,
-            onlyWah: false,
-            selectedSubjects: new Set()
-        };
-
-        const subjectCheckboxes = [];
-        subjects.forEach((subject, index) => {
-            const checkboxId = `subject-${index}`;
-            const wrapper = document.createElement('label');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = subject;
-            checkbox.id = checkboxId;
-            const textSpan = document.createElement('span');
-            textSpan.innerHTML = escapeHtml(subject).replace(/\n/g, '<br>');
-            wrapper.appendChild(checkbox);
-            wrapper.appendChild(textSpan);
-            subjectFiltersEl.appendChild(wrapper);
-            subjectCheckboxes.push({ checkbox, subject });
-
-            checkbox.addEventListener('change', () => {
-                if (checkbox.checked) {
-                    state.selectedSubjects.add(subject);
-                } else {
-                    state.selectedSubjects.delete(subject);
-                }
-                applyFilters();
-                updateSubjectVisibility();
-            });
-        });
-
-        document.getElementById('clearSubjects').addEventListener('click', () => {
-            subjectCheckboxes.forEach(({ checkbox }) => checkbox.checked = false);
-            state.selectedSubjects.clear();
-            applyFilters();
-            updateSubjectVisibility();
-        });
-
-        const dayElements = [];
-
-        daysContainer.innerHTML = '';
-        days.forEach((day, idx) => {
-            const detailsEl = document.createElement('details');
-            detailsEl.className = 'day-card';
-            if (idx === 0) detailsEl.open = true;
-            detailsEl.dataset.searchText = day.aggregatedText;
-            detailsEl.dataset.hasLesson = day.hasLesson ? 'true' : 'false';
-            detailsEl.dataset.hasWah = day.hasWah ? 'true' : 'false';
-            detailsEl.dataset.hasNoLesson = day.hasNoLesson ? 'true' : 'false';
-
-            const summaryEl = document.createElement('summary');
-            const summaryLeft = document.createElement('div');
-            summaryLeft.className = 'summary-left';
-            const titleEl = document.createElement('div');
-            titleEl.className = 'day-title';
-            titleEl.textContent = day.date;
-            summaryLeft.appendChild(titleEl);
-
-            const badgeRow = document.createElement('div');
-            badgeRow.className = 'badge-row';
-            const createBadge = (text, className) => {
-                const badge = document.createElement('span');
-                badge.className = `badge ${className}`;
-                badge.textContent = text;
-                return badge;
-            };
-            if (day.hasLesson) badgeRow.appendChild(createBadge('Lesson Plan', 'lesson'));
-            if (day.hasWah) badgeRow.appendChild(createBadge('WAH', 'wah'));
-            if (day.hasNoLesson) badgeRow.appendChild(createBadge('Contains “No Lesson”', 'warning'));
-            if (!badgeRow.childElementCount) {
-                badgeRow.appendChild(createBadge('No entries recorded', 'warning'));
-            }
-            summaryLeft.appendChild(badgeRow);
-
-            const summaryRight = document.createElement('div');
-            summaryRight.className = 'summary-right';
-            summaryRight.innerHTML = 'Click to expand';
-
-            summaryEl.appendChild(summaryLeft);
-            summaryEl.appendChild(summaryRight);
-
-            const dayContent = document.createElement('div');
-            dayContent.className = 'day-content';
-
-            const viewToggle = document.createElement('div');
-            viewToggle.className = 'view-toggle';
-            viewToggle.innerHTML = `
-                <button type="button" class="active" data-view="structured">Structured view</button>
-                <button type="button" data-view="raw">Raw data</button>
-            `;
-            dayContent.appendChild(viewToggle);
-
-            const structuredView = document.createElement('div');
-            structuredView.className = 'structured-view';
-            const subjectGrid = document.createElement('div');
-            subjectGrid.className = 'subject-grid';
-
-            const subjectCardMap = new Map();
-
-            day.subjects.forEach(subject => {
-                const card = document.createElement('div');
-                card.className = 'subject-card';
-                card.dataset.subject = subject.name;
-
-                const title = document.createElement('div');
-                title.className = 'subject-title';
-                title.innerHTML = escapeHtml(subject.name).replace(/\n/g, '<br>');
-                card.appendChild(title);
-
-                const lessonSection = document.createElement('div');
-                lessonSection.className = 'subject-section lesson-plan-section';
-                if (subject.lesson.hasNoLesson) lessonSection.classList.add('has-no-lesson');
-                lessonSection.innerHTML = `
-                    <div class="section-title">Lesson Plan</div>
-                    <div class="section-body">${subject.lesson.display}</div>
-                `;
-                card.appendChild(lessonSection);
-
-                const wahSection = document.createElement('div');
-                wahSection.className = 'subject-section wah-section';
-                if (subject.wah.hasNoLesson) wahSection.classList.add('has-no-lesson');
-                wahSection.innerHTML = `
-                    <div class="section-title">WAH (Work at Home)</div>
-                    <div class="section-body">${subject.wah.display}</div>
-                `;
-                card.appendChild(wahSection);
-
-                subjectGrid.appendChild(card);
-                subjectCardMap.set(subject.name, card);
-            });
-
-            structuredView.appendChild(subjectGrid);
-            dayContent.appendChild(structuredView);
-
-            const rawView = document.createElement('div');
-            rawView.className = 'raw-view hidden';
-            rawView.appendChild(buildRawTable(day.rawRows));
-            dayContent.appendChild(rawView);
-
-            detailsEl.appendChild(summaryEl);
-            detailsEl.appendChild(dayContent);
-            daysContainer.appendChild(detailsEl);
-
-            dayElements.push({
-                element: detailsEl,
-                data: day,
-                subjectCardMap
-            });
-        });
-
-        document.getElementById('searchInput').addEventListener('input', (event) => {
-            state.searchTerm = event.target.value.trim().toLowerCase();
-            applyFilters();
-        });
-
-        document.getElementById('filterLesson').addEventListener('change', (event) => {
-            state.onlyLesson = event.target.checked;
-            applyFilters();
-        });
-
-        document.getElementById('filterWah').addEventListener('change', (event) => {
-            state.onlyWah = event.target.checked;
-            applyFilters();
-        });
-
-        document.getElementById('expandAll').addEventListener('click', () => {
-            dayElements.forEach(({ element }) => element.open = true);
-        });
-
-        document.getElementById('collapseAll').addEventListener('click', () => {
-            dayElements.forEach(({ element }) => element.open = false);
-        });
-
-        daysContainer.addEventListener('click', (event) => {
-            if (event.target.matches('.view-toggle button')) {
-                const button = event.target;
-                const view = button.dataset.view;
-                const wrapper = button.closest('.day-content');
-                const toggle = button.parentElement;
-                toggle.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn === button));
-                wrapper.querySelector('.structured-view').classList.toggle('hidden', view !== 'structured');
-                wrapper.querySelector('.raw-view').classList.toggle('hidden', view !== 'raw');
-            }
-        });
-
-        applyFilters();
-        updateSubjectVisibility();
-
-        function applyFilters() {
-            let visibleCount = 0;
-            dayElements.forEach(({ element, data }) => {
-                const matchesLesson = !state.onlyLesson || data.hasLesson;
-                const matchesWah = !state.onlyWah || data.hasWah;
-                const matchesSearch = !state.searchTerm || element.dataset.searchText.includes(state.searchTerm);
-                const matchesSubjects = state.selectedSubjects.size === 0 ||
-                    data.subjects.some(subject =>
-                        state.selectedSubjects.has(subject.name) &&
-                        (subject.lesson.hasContent || subject.wah.hasContent)
-                    );
-
-                const shouldShow = matchesLesson && matchesWah && matchesSearch && matchesSubjects;
-                element.style.display = shouldShow ? '' : 'none';
-                if (shouldShow) visibleCount++;
-            });
-
-            visibleCountEl.textContent = visibleCount;
-            emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+        const wahCell = document.createElement("div");
+        wahCell.className = "cell wah-cell";
+        wahCell.dataset.label = "WAH (Work at Home)";
+        const wahValue = wahRow && Object.prototype.hasOwnProperty.call(wahRow, subject) ? wahRow[subject] : "";
+        const wahInfo = formatCellValue(wahValue);
+        wahCell.innerHTML = wahInfo.displayHTML;
+        if (!wahInfo.isEmpty) {
+          wahCell.classList.add("has-content");
+          hasWAHEntries = true;
+          searchPieces.push(wahInfo.plainText);
         }
-
-        function updateSubjectVisibility() {
-            dayElements.forEach(({ subjectCardMap, data }) => {
-                subjectCardMap.forEach((cardEl, subjectName) => {
-                    const showAll = state.selectedSubjects.size === 0;
-                    const isSelected = state.selectedSubjects.has(subjectName);
-                    cardEl.style.display = (showAll || isSelected) ? '' : 'none';
-                });
-            });
+        if (wahInfo.containsNoLesson) {
+          hasNoLessonEntries = true;
         }
+        row.appendChild(wahCell);
 
-        function buildRawTable(rawRows) {
-            const container = document.createElement('div');
-            if (!rawRows.length) {
-                container.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">No raw rows available.</p>';
-                return container;
-            }
+        grid.appendChild(row);
+      });
 
-            const columnsSet = new Set();
-            rawRows.forEach(row => {
-                Object.keys(row.data).forEach(key => columnsSet.add(key));
-            });
-
-            const priority = ['row_number', 'Date', 'Component'];
-            const columns = Array.from(columnsSet).sort((a, b) => {
-                const aPriority = priority.indexOf(a);
-                const bPriority = priority.indexOf(b);
-                if (aPriority !== -1 && bPriority !== -1) return aPriority - bPriority;
-                if (aPriority !== -1) return -1;
-                if (bPriority !== -1) return 1;
-                return a.localeCompare(b);
-            });
-
-            const table = document.createElement('table');
-            table.className = 'raw-table';
-
-            const thead = document.createElement('thead');
-            const headRow = document.createElement('tr');
-            const sourceTh = document.createElement('th');
-            sourceTh.textContent = 'Source';
-            headRow.appendChild(sourceTh);
-            columns.forEach(col => {
-                const th = document.createElement('th');
-                th.innerHTML = escapeHtml(col).replace(/\n/g, '<br>');
-                th.title = col;
-                headRow.appendChild(th);
-            });
-            thead.appendChild(headRow);
-            table.appendChild(thead);
-
-            const tbody = document.createElement('tbody');
-            rawRows.forEach(row => {
-                const tr = document.createElement('tr');
-                const sourceTd = document.createElement('td');
-                sourceTd.textContent = row.label || '—';
-                tr.appendChild(sourceTd);
-
-                columns.forEach(col => {
-                    const td = document.createElement('td');
-                    const value = row.data[col];
-                    if (value === undefined || value === null || String(value).trim() === '') {
-                        td.textContent = '—';
-                    } else {
-                        const sanitized = sanitizeText(String(value));
-                        const isNoLesson = /no lesson/i.test(String(value));
-                        if (isNoLesson) td.classList.add('no-lesson');
-                        td.innerHTML = sanitized;
-                    }
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
-            table.appendChild(tbody);
-            container.appendChild(table);
-            return container;
-        }
+      planSection.appendChild(grid);
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.textContent = "No subjects were listed for this date.";
+      planSection.appendChild(empty);
     }
+
+    const componentRows = [];
+    if (lessonRow) componentRows.push(lessonRow);
+    if (wahRow) componentRows.push(wahRow);
+
+    if (componentRows.length) {
+      const rawColumns = getSubjectsInOrder(componentRows);
+      // Ensure row_number, Component, Date appear first if available.
+      const priority = ["row_number", "Component", "Date"];
+      const orderedColumns = [];
+      priority.forEach(col => {
+        if (!ignoreColumns.has(col) && rawColumns.includes(col)) {
+          orderedColumns.push(col);
+        }
+      });
+      rawColumns.forEach(col => {
+        if (!orderedColumns.includes(col)) {
+          orderedColumns.push(col);
+        }
+      });
+
+      const { wrapper: tableWrapper, table } = buildRawTable(orderedColumns, componentRows);
+
+      const rawControls = document.createElement("div");
+      rawControls.className = "raw-controls";
+      const toggleWidthBtn = document.createElement("button");
+      toggleWidthBtn.type = "button";
+      toggleWidthBtn.textContent = "Expand columns";
+      rawControls.appendChild(toggleWidthBtn);
+
+      toggleWidthBtn.addEventListener("click", () => {
+        table.classList.toggle("wide");
+        const wide = table.classList.contains("wide");
+        toggleWidthBtn.textContent = wide ? "Compact columns" : "Expand columns";
+        toggleWidthBtn.classList.toggle("active", wide);
+      });
+
+      rawSection.appendChild(rawControls);
+      rawSection.appendChild(tableWrapper);
+    } else {
+      const emptyRaw = document.createElement("div");
+      emptyRaw.className = "empty-state";
+      emptyRaw.textContent = "No raw data rows were provided for this date.";
+      rawSection.appendChild(emptyRaw);
+    }
+
+    const badgeConfigs = [];
+    if (hasLessonEntries) {
+      badgeConfigs.push({ text: "Lesson Plan", className: "badge-lesson" });
+    }
+    if (hasWAHEntries) {
+      badgeConfigs.push({ text: "WAH available", className: "badge-wah" });
+    }
+    if (hasNoLessonEntries) {
+      badgeConfigs.push({ text: "Includes “No Lesson”", className: "badge-warning" });
+    }
+
+    if (badgeConfigs.length) {
+      badgeConfigs.forEach(cfg => badgeGroup.appendChild(createBadge(cfg.text, cfg.className)));
+      headerLeft.appendChild(badgeGroup);
+    }
+
+    body.appendChild(viewToggle);
+    body.appendChild(planSection);
+    body.appendChild(rawSection);
+
+    headerBtn.addEventListener("click", () => {
+      const isOpen = card.classList.contains("open");
+      setCardOpen(card, !isOpen);
+    });
+
+    planTabBtn.addEventListener("click", () => {
+      planTabBtn.classList.add("active");
+      planTabBtn.setAttribute("aria-pressed", "true");
+      rawTabBtn.classList.remove("active");
+      rawTabBtn.setAttribute("aria-pressed", "false");
+      planSection.classList.add("active");
+      rawSection.classList.remove("active");
+    });
+
+    rawTabBtn.addEventListener("click", () => {
+      rawTabBtn.classList.add("active");
+      rawTabBtn.setAttribute("aria-pressed", "true");
+      planTabBtn.classList.remove("active");
+      planTabBtn.setAttribute("aria-pressed", "false");
+      rawSection.classList.add("active");
+      planSection.classList.remove("active");
+    });
+
+    const lessonAvailable = hasLessonEntries ? "true" : "false";
+    const wahAvailable = hasWAHEntries ? "true" : "false";
+    const noLessonText = hasNoLessonEntries ? "true" : "false";
+
+    card.dataset.hasLesson = lessonAvailable;
+    card.dataset.hasWah = wahAvailable;
+    card.dataset.hasNoLesson = noLessonText;
+    card.dataset.search = searchPieces.join(" ").toLowerCase();
+
+    card.appendChild(headerBtn);
+    card.appendChild(body);
+    container.appendChild(card);
+    dayCards.push(card);
+  }
+
+  function syncToggleStyles() {
+    toggleLabels.forEach(label => {
+      const input = label.querySelector("input");
+      if (input) {
+        label.classList.toggle("active", input.checked);
+      }
+    });
+  }
+
+  function applyFilters() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const requireWAH = filterWAH.checked;
+    const requireLesson = filterLesson.checked;
+    let visibleCount = 0;
+
+    dayCards.forEach(card => {
+      const matchesSearch = !searchTerm || card.dataset.search.includes(searchTerm);
+      const matchesWAH = !requireWAH || card.dataset.hasWah === "true";
+      const matchesLesson = !requireLesson || card.dataset.hasLesson === "true";
+
+      if (matchesSearch && matchesWAH && matchesLesson) {
+        card.classList.remove("hidden");
+        visibleCount += 1;
+      } else {
+        card.classList.add("hidden");
+      }
+    });
+
+    noResultsEl.classList.toggle("hidden", visibleCount > 0);
+  }
+
+  function toggleAllCards() {
+    allExpanded = !allExpanded;
+    dayCards.forEach(card => {
+      if (!card.classList.contains("hidden")) {
+        setCardOpen(card, allExpanded);
+      }
+    });
+    expandCollapseBtn.textContent = allExpanded ? "Collapse all" : "Expand all";
+  }
+
+  (function render() {
+    const dayEntries = Object.entries(data || {});
+    if (!dayEntries.length) {
+      const empty = document.createElement("div");
+      empty.className = "no-results";
+      empty.textContent = "No schedule data available. Please add data to get started.";
+      container.appendChild(empty);
+      return;
+    }
+    dayEntries.forEach(([dateLabel, dayData]) => {
+      createDayCard(dateLabel, dayData || {});
+    });
+  })();
+
+  searchInput.addEventListener("input", () => {
+    applyFilters();
+  });
+
+  [filterWAH, filterLesson].forEach(input => {
+    input.addEventListener("change", () => {
+      syncToggleStyles();
+      applyFilters();
+    });
+  });
+
+  expandCollapseBtn.addEventListener("click", () => {
+    toggleAllCards();
+  });
+
+  syncToggleStyles();
+  applyFilters();
 })();
 </script>
 </body>
