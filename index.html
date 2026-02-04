@@ -4,229 +4,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Plan and Work At Home</title>
+    <title>School Learning Plan</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
         }
-        h1 {
+        header {
+            background: #007bff;
+            color: #fff;
+            padding: 10px 20px;
             text-align: center;
-            color: #333;
         }
         .container {
             max-width: 800px;
-            margin: auto;
-            background: white;
+            margin: 20px auto;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+        .accordion {
+            margin-bottom: 1rem;
+            border: 1px solid #007bff;
+            border-radius: 5px;
         }
-        th, td {
+        .accordion-header {
+            background: #007bff;
+            color: #fff;
             padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+            position: relative;
         }
-        th {
-            background-color: #4CAF50;
+        .badge {
+            background: #ffcc00;
+            color: #000;
+            border-radius: 12px;
+            padding: 5px 10px;
+            margin-left: 10px;
+            font-size: 0.85em;
+        }
+        .badge-warning {
+            background: red;
             color: white;
         }
-        h3 {
-            color: #444;
-            border-bottom: 2px solid #4CAF50;
-            margin-top: 40px;
-            padding-bottom: 10px;
+        .accordion-content {
+            display: none;
+            padding: 10px;
+            border-top: 1px solid #007bff;
+        }
+        .subject {
+            margin: 10px 0;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.85em;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+        #summary {
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            .accordion-header, .badge {
+                font-size: 0.8em;
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Learning Plan and Work At Home</h1>
+
+<header>
+    <h1>School Learning Plan</h1>
+</header>
+
+<div class="container">
+    <div id="summary"></div>
+    <input type="text" id="search" placeholder="Search...">
+    
+    <div id="accordion-container"></div>
+</div>
+
+<footer>
+    &copy; 2023 School Learning Plan
+</footer>
+
+<script>
+    const data = {"Fri, 20 Feb":{"lesson_plan":{"row_number":3,"Date":"Fri, 20 Feb","Component":"Lesson Plan","Morning Circle / HR":"Section-wise assembly","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: \nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":4,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Thu, 19 Feb":{"lesson_plan":{"row_number":5,"Date":"Thu, 19 Feb","Component":"Lesson Plan","Morning Circle / HR":"Stories about scientists by students","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"No lesson - holiday","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":6,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Wed, 18 Feb":{"lesson_plan":{"row_number":7,"Date":"Wed, 18 Feb","Component":"Lesson Plan","Morning Circle / HR":"Stories about scientists by students","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: \nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":8,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Tue, 17 Feb":{"lesson_plan":{"row_number":9,"Date":"Tue, 17 Feb","Component":"Lesson Plan","Morning Circle / HR":"Stories about scientists by students","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"No lesson","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":10,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}},"Mon, 16 Feb":{"lesson_plan":{"row_number":11,"Date":"Mon, 16 Feb","Component":"Lesson Plan","Morning Circle / HR":"Stories about scientists","Art":"","EVLF":"","Design Lab":"","English":"No Lesson","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"Theme : Light\nResource : Science Textbook\n\nWU: \nML: \nPW: ","PLEASE DO NOT REMOVE THIS COLUMN.":""},"wah":{"row_number":12,"Date":"","Component":"WAH","Morning Circle / HR":"","Art":"","EVLF":"","Design Lab":"","English":"","Creative Writing":"","Hindi":"","Marathi\nResources Folder":"","Numeracy\nG3 Resource folder":"","Sports":"","Thematics\n\nLESSON RESOURCES\n THEMATICS PROJECT \nANSWER KEY":"","PLEASE DO NOT REMOVE THIS COLUMN.":""}}};
+
+    const accordionContainer = document.getElementById('accordion-container');
+    const summaryContainer = document.getElementById('summary');
+
+    function formatSummary(data) {
+        const days = Object.keys(data).length;
+        const subjects = new Set();
+        for (const date in data) {
+            if (data[date].lesson_plan) {
+                Object.keys(data[date].lesson_plan).forEach(subject => {
+                    if (subject !== 'row_number' && subject !== 'Date' && subject !== 'Component') {
+                        subjects.add(subject);
+                    }
+                });
+            }
+        }
+        return `Summary: ${days} Days | Detected Subjects: ${Array.from(subjects).join(', ')}`;
+    }
+
+    summaryContainer.innerHTML = formatSummary(data);
+
+    function createAccordion(date, lessonPlan, wah) {
+        const accordion = document.createElement('div');
+        accordion.classList.add('accordion');
         
-        <h3>Week of 2nd February</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Component</th>
-                    <th>Morning Circle / HR</th>
-                    <th>Lesson Resources</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Mon, 2 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Common assembly<br>HR lesson: Rehearsal for G3 assembly</td>
-                    <td>Theme: Earth and its habitat<br>WU: Pg. 92 Questions about tiger.<br>ML: Stating the differences between habitat, ecosystem, environment.<br>PW: Making a table for differences</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td>WAH: CYP Question 4. DUE on 5th Feb.</td>
-                </tr>
-                <tr>
-                    <td>Tue, 3 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Rehearsal for G3 assembly</td>
-                    <td>No Lesson</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Wed, 4 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Rehearsal for G3 assembly</td>
-                    <td>Theme: Earth and its habitat<br>WU: YouTube link on evolution<br>ML: How are different animals suited to their habitats? <br>PW: Finding out features of animals.</td>
-                </tr>
-            </tbody>
-        </table>
+        let hasLessonPlan = false;
+        let hasWAH = false;
+        let hasNoLesson = false;
         
-        <h3>Week of 9th - 20th February</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Component</th>
-                    <th>Morning Circle / HR</th>
-                    <th>Lesson Resources</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Mon, 9 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>G3 assembly presentation<br>Short film on inventions</td>
-                    <td>Theme: Light<br>WU: Are you all stars? Give reason.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Tue, 10 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Le Panga match for G3</td>
-                    <td>No lesson</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Wed, 11 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Experience of playing - sharing by students</td>
-                    <td>Theme: Light<br>WU: Participate in discussions.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Thu, 12 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Sharing experiences of playing</td>
-                    <td>Theme: Light<br>WU: Exploration activities.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Fri, 13 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Section-wise assembly</td>
-                    <td>Theme: Light<br>WU: Engage in discussions.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Mon, 16 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Stories about scientists</td>
-                    <td>Theme: Light<br>WU: Engage in story-telling.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Tue, 17 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Stories about scientists</td>
-                    <td>No lesson</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Wed, 18 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Stories about scientists</td>
-                    <td>Theme: Light<br>WU: Exploration of themes.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Thu, 19 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Stories about scientists</td>
-                    <td>No lesson - holiday</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Fri, 20 Feb</td>
-                    <td>Lesson Plan</td>
-                    <td>Section-wise assembly</td>
-                    <td>Theme: Light<br>WU: Participate in discussions.</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>WAH</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        let lessonPlanContent = '';
+        let wahContent = '';
+
+        for (const subject in lessonPlan) {
+            const lpEntry = lessonPlan[subject] || '—';
+            if (lpEntry.includes("No Lesson")) hasNoLesson = true;
+            if (lpEntry !== "") hasLessonPlan = true;
+            lessonPlanContent += `<strong>${subject}:</strong> ${lpEntry}<br>`;
+        }
+
+        for (const subject in wah) {
+            const wahEntry = wah[subject] || '—';
+            if (wahEntry !== "") hasWAH = true;
+            wahContent += `<strong>${subject}:</strong> ${wahEntry}<br>`;
+        }
+
+        const header = document.createElement('div');
+        header.classList.add('accordion-header');
+        header.innerHTML = `${date} 
+            <span class="badge">${hasLessonPlan ? "Lesson Plan" : "No Lesson Plan"}</span>
+            <span class="badge">${hasWAH ? "WAH" : "No WAH"}</span>
+            <span class="badge badge-warning">${hasNoLesson ? "No Lesson" : ""}</span>
+        `;
+        header.onclick = () => {
+            const content = header.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        };
+
+        const content = document.createElement('div');
+        content.classList.add('accordion-content');
+        content.innerHTML = `<div class="subject"><strong>Lesson Plan</strong><br>${lessonPlanContent || 'No entry'}</div>
+                            <div class="subject"><strong>WAH (Work at Home)</strong><br>${wahContent || 'No entry'}</div>`;
+
+        accordion.appendChild(header);
+        accordion.appendChild(content);
+        accordionContainer.appendChild(accordion);
+    }
+
+    for (const date in data) {
+        if (data[date].lesson_plan && data[date].wah) {
+            createAccordion(date, data[date].lesson_plan, data[date].wah);
+        }
+    }
+</script>
 </body>
 </html>
