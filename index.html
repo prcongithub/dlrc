@@ -959,9 +959,11 @@ fetchData();
     if (hasWAHEntries) {
       badgeConfigs.push({ text: "WAH available", className: "badge-wah" });
     }
+    /*
     if (hasNoLessonEntries) {
       badgeConfigs.push({ text: "Includes “No Lesson”", className: "badge-warning" });
     }
+    */
 
     if (badgeConfigs.length) {
       badgeConfigs.forEach(cfg => badgeGroup.appendChild(createBadge(cfg.text, cfg.className)));
