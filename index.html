@@ -163,6 +163,15 @@ header p {
   overflow: hidden;
 }
 
+.day-card.tomorrow {
+  border: 2px solid #4051b5;
+  box-shadow: 0 0 0 3px rgba(64, 81, 181, 0.15), var(--shadow);
+}
+
+.day-card.tomorrow .day-header {
+  background: linear-gradient(135deg, #f0f3ff 0%, #e4e8ff 100%);
+}
+
 .day-header {
   width: 100%;
   display: flex;
@@ -232,6 +241,13 @@ header p {
 .badge-warning {
   background: var(--badge-warning-bg);
   color: var(--badge-warning-text);
+}
+
+.badge-tomorrow {
+  background: linear-gradient(135deg, #4051b5 0%, #5865c7 100%);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(64, 81, 181, 0.3);
 }
 
 .header-right {
@@ -612,7 +628,6 @@ async function fetchData() {
     }
     data = await response.json();
     data = data.data;
-    debugger
     init();
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -639,6 +654,41 @@ fetchData();
 
   const dayCards = [];
   let allExpanded = false;
+
+  // Function to check if a date string represents tomorrow
+  function isTomorrow(dateStr) {
+    try {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+
+      // Parse date strings like "Fri, 6 Feb" or "Wed, 28 Jan"
+      const parts = dateStr.match(/(\w{3}),?\s+(\d{1,2})(?:st|nd|rd|th)?\s+(\w{3})/);
+      if (!parts) return false;
+
+      const day = parseInt(parts[2]);
+      const monthStr = parts[3];
+      const monthMap = {
+        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+      };
+      const month = monthMap[monthStr];
+
+      if (month === undefined) return false;
+
+      // Create date with current year
+      const checkDate = new Date(tomorrow.getFullYear(), month, day);
+
+      // If the date has passed this year, try next year
+      if (checkDate < new Date()) {
+        checkDate.setFullYear(checkDate.getFullYear() + 1);
+      }
+
+      return checkDate.getTime() === tomorrow.getTime();
+    } catch (e) {
+      return false;
+    }
+  }
 
   function escapeHTML(value) {
     return value.replace(/&/g, "&amp;")
@@ -952,7 +1002,19 @@ fetchData();
       rawSection.appendChild(emptyRaw);
     }
 
+    // Check if this date is tomorrow and add highlight
+    const isTomorrowDate = isTomorrow(dateLabel);
+    if (isTomorrowDate) {
+      card.classList.add("tomorrow");
+    }
+
     const badgeConfigs = [];
+
+    // Add "Tomorrow" badge first if applicable
+    if (isTomorrowDate) {
+      badgeConfigs.push({ text: "Tomorrow", className: "badge-tomorrow" });
+    }
+
     if (hasLessonEntries) {
       badgeConfigs.push({ text: "Lesson Plan", className: "badge-lesson" });
     }
@@ -961,7 +1023,7 @@ fetchData();
     }
     /*
     if (hasNoLessonEntries) {
-      badgeConfigs.push({ text: "Includes “No Lesson”", className: "badge-warning" });
+      badgeConfigs.push({ text: "Includes "No Lesson"", className: "badge-warning" });
     }
     */
 
